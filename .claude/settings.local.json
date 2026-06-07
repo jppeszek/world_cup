@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p backend frontend)",
+      "Bash(npm init *)",
+      "Bash(npm --version)"
+    ]
+  }
+}
