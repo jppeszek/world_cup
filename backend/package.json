@@ -10,8 +10,10 @@
     "start": "node dist/index.js",
     "migrate": "node scripts/migrate.js",
     "seed": "tsx scripts/seedFixtures.ts",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "jest --testPathPattern='(?<!integration)\\.test\\.ts$'",
+    "test:watch": "jest --watch --testPathPattern='(?<!integration)\\.test\\.ts$'",
+    "test:integration": "jest --testPathPattern='integration\\.test\\.ts$'",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
