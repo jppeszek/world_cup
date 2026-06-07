@@ -11,7 +11,7 @@ describe('Lock Enforcement', () => {
   const futureTime = new Date('2026-06-11T16:00:00Z'); // 2 hours in future
   const pastTime = new Date('2026-06-11T12:00:00Z'); // 2 hours in past
 
-  const createMatch = (kickoffUtc: Date, scoreHome?: number, scoreAway?: number): Match => ({
+  const createMatch = (kickoffUtc: Date, scoreHome: number | null = null, scoreAway: number | null = null): Match => ({
     id: 1,
     external_ref: 'test',
     stage: 'group',

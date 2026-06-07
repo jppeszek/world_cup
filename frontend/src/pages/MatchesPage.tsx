@@ -118,12 +118,15 @@ export function MatchesPage() {
   };
 
   const getStatusBadge = (match: Match) => {
+    // Check if match has a result
+    if (match.score_home !== null && match.score_home !== undefined &&
+        match.score_away !== null && match.score_away !== undefined) {
+      return <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">Finished</span>;
+    }
+
     const kickoff = new Date(match.kickoff_utc).getTime();
     const now = Date.now();
 
-    if (match.score_home !== undefined && match.score_away !== undefined) {
-      return <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">Finished</span>;
-    }
     if (kickoff <= now) {
       return <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs">Locked</span>;
     }
@@ -176,9 +179,13 @@ export function MatchesPage() {
               {matchesByDate[date].map((match) => {
                 const prediction = predictions.get(match.id);
                 const isEditing = editingMatchId === match.id;
-                const isLocked =
-                  new Date(match.kickoff_utc).getTime() <= Date.now() ||
-                  (match.score_home !== undefined && match.score_away !== undefined);
+                const kickoffTime = new Date(match.kickoff_utc).getTime();
+                const now = Date.now();
+                const hasScores = match.score_home !== null && match.score_home !== undefined &&
+                                  match.score_away !== null && match.score_away !== undefined;
+                const isLocked = kickoffTime <= now || hasScores;
+
+                console.log(`Match ${match.team_home} vs ${match.team_away}: kickoff=${kickoffTime}, now=${now}, locked=${isLocked}, hasScores=${hasScores}`);
 
                 return (
                   <div
@@ -200,7 +207,7 @@ export function MatchesPage() {
                       <div>{getStatusBadge(match)}</div>
                     </div>
 
-                    {match.score_home !== undefined && match.score_away !== undefined ? (
+                    {match.score_home !== null && match.score_home !== undefined && match.score_away !== null && match.score_away !== undefined ? (
                       <div className="bg-blue-50 p-3 rounded border border-blue-200">
                         <div className="flex items-center justify-center gap-4 mb-2">
                           <div className="text-center">

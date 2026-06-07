@@ -1,8 +1,10 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
+const connectionString = process.env.DATABASE_URL || 'postgresql://localhost/world_cup';
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: connectionString,
   max: 5, // Limit connections for free tier
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

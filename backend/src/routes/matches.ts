@@ -49,7 +49,11 @@ router.get('/', async (req: Request, res: Response) => {
     // Group by date
     const grouped: { [key: string]: any[] } = {};
     for (const match of matches) {
-      const date = match.kickoff_utc.split('T')[0];
+      // Convert Date to ISO string if needed
+      const kickoffStr = match.kickoff_utc instanceof Date
+        ? match.kickoff_utc.toISOString()
+        : match.kickoff_utc;
+      const date = kickoffStr.split('T')[0];
       if (!grouped[date]) {
         grouped[date] = [];
       }

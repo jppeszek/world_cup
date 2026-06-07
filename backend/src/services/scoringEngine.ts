@@ -41,20 +41,17 @@ export function scoreMatch(prediction: Prediction, match: Match): ScoreResult {
     actualOutcome = 'draw';
   }
 
-  // For knockout draws, check if predicted winner matches actual winner
+  // Determine if outcome is correct
   let outcomeCorrect = false;
+
   if (exactScore) {
-    outcomeCorrect = true;
-  } else if (predOutcome === 'draw' && actualOutcome === 'draw') {
-    outcomeCorrect = true;
-  } else if (predOutcome !== 'draw' && actualOutcome !== 'draw') {
-    // For knockout matches with actual winner, check if user predicted correct winner
-    if (prediction.pred_winner === actualOutcome) {
-      outcomeCorrect = true;
-    }
-  } else if (predOutcome !== 'draw' && actualOutcome !== 'draw' && predOutcome === actualOutcome) {
+    // Exact score always means outcome is correct
     outcomeCorrect = true;
   } else if (predOutcome === actualOutcome) {
+    // Predicted outcome matches actual outcome
+    outcomeCorrect = true;
+  } else if (actualOutcome !== 'draw' && prediction.pred_winner === actualOutcome) {
+    // For knockout matches: user predicted the correct winner even if score wrong
     outcomeCorrect = true;
   }
 

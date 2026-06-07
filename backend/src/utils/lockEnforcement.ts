@@ -25,6 +25,11 @@ export function getTimeToKickoff(match: Match, serverTime: Date = new Date()): n
 
 export function formatTimeToKickoff(match: Match, serverTime: Date = new Date()): string {
   const ms = getTimeToKickoff(match, serverTime);
+
+  if (ms === 0) {
+    return 'Locked';
+  }
+
   const hours = Math.floor(ms / (1000 * 60 * 60));
   const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
 

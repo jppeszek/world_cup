@@ -14,10 +14,8 @@ const client: AxiosInstance = axios.create({
 client.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
-      window.location.href = '/login';
-    }
+    // Don't redirect on 401 - let the app handle it
+    // This prevents redirect loops during auth check
     return Promise.reject(error);
   }
 );
