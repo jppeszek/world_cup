@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: world-cup-backend
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: world-cup-db
+          property: connectionString
+      - key: SESSION_SECRET
+        sync: false
+      - key: IMPORT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://world-cup-frontend.onrender.com
+      - key: API_FOOTBALL_KEY
+        sync: false
+
+  - type: static
+    name: world-cup-frontend
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    routes:
+      - path: /
+        destination: /index.html
+      - path: /assets/*
+        destination: /assets/*
+
+databases:
+  - name: world-cup-db
+    plan: free
