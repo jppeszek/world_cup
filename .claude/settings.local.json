@@ -3,7 +3,9 @@
     "allow": [
       "Bash(mkdir -p backend frontend)",
       "Bash(npm init *)",
-      "Bash(npm --version)"
+      "Bash(npm --version)",
+      "Bash(psql postgresql://localhost/world_cup -c \"TRUNCATE matches CASCADE; TRUNCATE predictions CASCADE;\")",
+      "Bash(npx ts-node *)"
     ]
   }
 }
