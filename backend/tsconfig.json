@@ -15,8 +15,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "declaration": false,
-    "ignoreDeprecations": "6.0",
-    "types": ["node"]
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
