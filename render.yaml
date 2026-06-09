@@ -18,18 +18,7 @@ services:
       - key: PORT
         value: 5000
       - key: FRONTEND_URL
-        value: https://world-cup-frontend.onrender.com
-
-  - type: static
-    name: world-cup-frontend
-    staticPublishPath: frontend/dist
-    buildCommand: cd frontend && npm install && npm run build
-    routes:
-      - path: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        value: https://world-cup-backend.onrender.com
+        value: https://world-cup.onrender.com
 
 databases:
   - name: world-cup-db
