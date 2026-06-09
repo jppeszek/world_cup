@@ -4,8 +4,19 @@ import { requireAdmin, requireInternalToken } from '../middleware/auth.js';
 import { generateRandomToken } from '../utils/hash.js';
 import { scoreAllPredictionsForMatch } from '../services/scoringEngine.js';
 import fetch from 'node-fetch';
+import db from '../db.js';
 
 const router = Router();
+
+// Helper to check if user is admin
+async function getAdminStatus(userId: number): Promise<boolean> {
+  try {
+    const result = await query('SELECT is_admin FROM users WHERE id = $1', [userId]);
+    return result.rows.length > 0 && result.rows[0].is_admin;
+  } catch {
+    return false;
+  }
+}
 
 // POST /api/admin/invites - Create and send invite
 router.post('/invites', requireAdmin, async (req: Request, res: Response) => {
@@ -72,7 +83,15 @@ router.get('/invites', requireAdmin, async (req: Request, res: Response) => {
 });
 
 // POST /api/admin/import-results - Import results from API-Football
-router.post('/import-results', requireInternalToken, async (req: Request, res: Response) => {
+router.post('/import-results', async (req: Request, res: Response) => {
+  // Check for either internal token (cron) or admin user (manual)
+  const internalToken = req.headers['x-import-secret'];
+  const isValidToken = internalToken === process.env.IMPORT_SECRET;
+  const isAdmin = req.session?.userId && (await getAdminStatus(req.session.userId));
+
+  if (!isValidToken && !isAdmin) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
   try {
     console.log('Starting result import...');
 
@@ -182,6 +201,76 @@ router.get('/matches/:match_id/predictions', requireAdmin, async (req: Request, 
   } catch (error) {
     console.error('Get predictions error:', error);
     res.status(500).json({ error: 'Failed to get predictions' });
+  }
+});
+
+// PUT /api/admin/matches/:match_id/score - Manually set match score (admin only)
+router.put('/matches/:match_id/score', requireAdmin, async (req: Request, res: Response) => {
+  const matchId = parseInt(req.params.match_id);
+  const { score_home, score_away } = req.body;
+
+  if (score_home === undefined || score_away === undefined) {
+    return res.status(400).json({ error: 'score_home and score_away required' });
+  }
+
+  try {
+    // Update match score
+    const updateResult = await query(
+      `UPDATE matches
+       SET score_home = $1, score_away = $2, status = 'finished', result_imported_at = NOW(), updated_at = NOW()
+       WHERE id = $3
+       RETURNING *`,
+      [score_home, score_away, matchId],
+    );
+
+    if (updateResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    const match = updateResult.rows[0];
+
+    // Rescore all predictions for this match
+    await scoreAllPredictionsForMatch(matchId, { query });
+
+    res.json({
+      message: 'Match score updated and predictions rescored',
+      match,
+    });
+  } catch (error) {
+    console.error('Set match score error:', error);
+    res.status(500).json({ error: 'Failed to set match score' });
+  }
+});
+
+// PUT /api/admin/matches/:match_id/teams - Manually edit match team names (admin only)
+router.put('/matches/:match_id/teams', requireAdmin, async (req: Request, res: Response) => {
+  const matchId = parseInt(req.params.match_id);
+  const { team_home, team_away } = req.body;
+
+  if (!team_home || !team_away) {
+    return res.status(400).json({ error: 'team_home and team_away required' });
+  }
+
+  try {
+    const updateResult = await query(
+      `UPDATE matches
+       SET team_home = $1, team_away = $2, updated_at = NOW()
+       WHERE id = $3
+       RETURNING *`,
+      [team_home, team_away, matchId],
+    );
+
+    if (updateResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    res.json({
+      message: 'Match teams updated',
+      match: updateResult.rows[0],
+    });
+  } catch (error) {
+    console.error('Update match teams error:', error);
+    res.status(500).json({ error: 'Failed to update match teams' });
   }
 });
 

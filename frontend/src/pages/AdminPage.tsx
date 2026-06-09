@@ -9,16 +9,40 @@ interface Invite {
   accepted_at: string | null;
 }
 
+interface Match {
+  id: number;
+  team_home: string;
+  team_away: string;
+  kickoff_utc: string;
+  status: string;
+  score_home?: number | null;
+  score_away?: number | null;
+}
+
 export function AdminPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [invites, setInvites] = useState<Invite[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [importing, setImporting] = useState(false);
 
+  // Score entry state
+  const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
+  const [scoreHome, setScoreHome] = useState('');
+  const [scoreAway, setScoreAway] = useState('');
+  const [settingScore, setSettingScore] = useState(false);
+
+  // Team edit state
+  const [editingTeamsMatchId, setEditingTeamsMatchId] = useState<number | null>(null);
+  const [editTeamHome, setEditTeamHome] = useState('');
+  const [editTeamAway, setEditTeamAway] = useState('');
+  const [editingTeams, setEditingTeams] = useState(false);
+
   useEffect(() => {
     loadInvites();
+    loadMatches();
   }, []);
 
   const loadInvites = async () => {
@@ -29,6 +53,29 @@ export function AdminPage() {
       setError('Failed to load invites');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMatches = async () => {
+    try {
+      const response = await api.getMatches();
+      const allMatches: Match[] = [];
+
+      // Response has {matches: {date: [matches]}} structure
+      const matchesByDate = response.data.matches;
+      if (matchesByDate && typeof matchesByDate === 'object') {
+        Object.values(matchesByDate).forEach((dayMatches: any) => {
+          if (Array.isArray(dayMatches)) {
+            allMatches.push(...dayMatches);
+          }
+        });
+      }
+
+      setMatches(allMatches.sort((a, b) =>
+        new Date(a.kickoff_utc).getTime() - new Date(b.kickoff_utc).getTime()
+      ));
+    } catch (err) {
+      console.error('Failed to load matches:', err);
     }
   };
 
@@ -52,6 +99,35 @@ export function AdminPage() {
     }
   };
 
+  const handleSetScore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!selectedMatchId || scoreHome === '' || scoreAway === '') {
+      setError('Match and scores required');
+      return;
+    }
+
+    setSettingScore(true);
+
+    try {
+      const response = await api.setMatchScore(selectedMatchId, {
+        score_home: parseInt(scoreHome),
+        score_away: parseInt(scoreAway),
+      });
+      setSuccess(`Score updated: ${scoreHome}-${scoreAway}`);
+      setSelectedMatchId(null);
+      setScoreHome('');
+      setScoreAway('');
+      await loadMatches();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to set score');
+    } finally {
+      setSettingScore(false);
+    }
+  };
+
   const handleImportResults = async () => {
     setError('');
     setSuccess('');
@@ -64,6 +140,41 @@ export function AdminPage() {
       setError(err.response?.data?.error || 'Failed to import results');
     } finally {
       setImporting(false);
+    }
+  };
+
+  const handleEditTeams = (match: Match) => {
+    setEditingTeamsMatchId(match.id);
+    setEditTeamHome(match.team_home);
+    setEditTeamAway(match.team_away);
+  };
+
+  const handleUpdateTeams = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!editingTeamsMatchId || !editTeamHome || !editTeamAway) {
+      setError('Both team names required');
+      return;
+    }
+
+    setEditingTeams(true);
+
+    try {
+      await api.updateMatchTeams(editingTeamsMatchId, {
+        team_home: editTeamHome,
+        team_away: editTeamAway,
+      });
+      setSuccess(`Teams updated: ${editTeamHome} vs ${editTeamAway}`);
+      setEditingTeamsMatchId(null);
+      setEditTeamHome('');
+      setEditTeamAway('');
+      await loadMatches();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to update teams');
+    } finally {
+      setEditingTeams(false);
     }
   };
 
@@ -97,7 +208,7 @@ export function AdminPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Invite Section */}
         <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
           <h2 className="text-2xl font-bold mb-4">Create Invite</h2>
@@ -160,6 +271,147 @@ export function AdminPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Manual Score Entry */}
+        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <h2 className="text-2xl font-bold mb-4">Set Match Score</h2>
+
+          <form onSubmit={handleSetScore} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Match</label>
+              <select
+                value={selectedMatchId || ''}
+                onChange={(e) => setSelectedMatchId(e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Choose a match...</option>
+                {matches.map((match) => (
+                  <option key={match.id} value={match.id}>
+                    {match.team_home} vs {match.team_away} ({new Date(match.kickoff_utc).toLocaleDateString()})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Home Score</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  value={scoreHome}
+                  onChange={(e) => setScoreHome(e.target.value)}
+                  placeholder="0"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Away Score</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  value={scoreAway}
+                  onChange={(e) => setScoreAway(e.target.value)}
+                  placeholder="0"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={settingScore}
+              className={`w-full py-2 px-4 rounded-lg font-semibold text-white transition ${
+                settingScore
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700'
+              }`}
+            >
+              {settingScore ? 'Saving...' : 'Set Score'}
+            </button>
+          </form>
+
+          <p className="text-xs text-gray-500 mt-4">
+            💡 Manually enter match results. Predictions will be auto-scored.
+          </p>
+        </div>
+
+        {/* Edit Team Names */}
+        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <h2 className="text-2xl font-bold mb-4">Edit Match Teams</h2>
+
+          <form onSubmit={handleUpdateTeams} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Match</label>
+              <select
+                value={editingTeamsMatchId || ''}
+                onChange={(e) => {
+                  const matchId = e.target.value ? parseInt(e.target.value) : null;
+                  if (matchId) {
+                    const match = matches.find(m => m.id === matchId);
+                    if (match) {
+                      handleEditTeams(match);
+                    }
+                  } else {
+                    setEditingTeamsMatchId(null);
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Choose a match...</option>
+                {matches.map((match) => (
+                  <option key={match.id} value={match.id}>
+                    {match.team_home} vs {match.team_away}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {editingTeamsMatchId && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Home Team</label>
+                  <input
+                    type="text"
+                    value={editTeamHome}
+                    onChange={(e) => setEditTeamHome(e.target.value)}
+                    placeholder="Team name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Away Team</label>
+                  <input
+                    type="text"
+                    value={editTeamAway}
+                    onChange={(e) => setEditTeamAway(e.target.value)}
+                    placeholder="Team name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={editingTeams}
+                  className={`w-full py-2 px-4 rounded-lg font-semibold text-white transition ${
+                    editingTeams
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-purple-600 hover:bg-purple-700'
+                  }`}
+                >
+                  {editingTeams ? 'Updating...' : 'Update Teams'}
+                </button>
+              </>
+            )}
+          </form>
+
+          <p className="text-xs text-gray-500 mt-4">
+            💡 Use this to rename knockout matches with actual team names (e.g., "Winner A" → "Argentina").
+          </p>
         </div>
 
         {/* Results Import Section */}

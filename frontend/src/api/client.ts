@@ -51,6 +51,10 @@ export const api = {
   createInvite: (data: { email: string }) => client.post('/api/admin/invites', data),
   getInvites: () => client.get('/api/admin/invites'),
   importResults: () => client.post('/api/admin/import-results'),
+  setMatchScore: (matchId: number, data: { score_home: number; score_away: number }) =>
+    client.put(`/api/admin/matches/${matchId}/score`, data),
+  updateMatchTeams: (matchId: number, data: { team_home: string; team_away: string }) =>
+    client.put(`/api/admin/matches/${matchId}/teams`, data),
 };
 
 export default client;

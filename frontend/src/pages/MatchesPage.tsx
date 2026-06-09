@@ -38,7 +38,7 @@ export function MatchesPage() {
     loadPredictions();
     const interval = setInterval(() => setMatchesByDate({ ...matchesByDate }), 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user?.id]); // Reload when user changes
 
   const loadMatches = async () => {
     try {
