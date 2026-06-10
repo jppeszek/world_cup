@@ -28,14 +28,15 @@ app.use(helmet());
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5555',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+  process.env.FRONTEND_URL || 'https://world-cup-backend-wrbs.onrender.com',
+];
 
 app.use(cors({
-  origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
 }));
 app.use(express.json());
 
