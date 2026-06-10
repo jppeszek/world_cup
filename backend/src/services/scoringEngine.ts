@@ -60,7 +60,7 @@ export function scoreMatch(prediction: Prediction, match: Match): ScoreResult {
   if (exactScore) {
     points = 3; // 2 for outcome + 1 bonus
   } else if (outcomeCorrect) {
-    points = 2;
+    points = 1;
   }
 
   return {
