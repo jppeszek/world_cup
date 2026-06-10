@@ -48,7 +48,7 @@ app.use(
     }),
     secret: process.env.SESSION_SECRET || 'dev-secret-change-in-prod',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
