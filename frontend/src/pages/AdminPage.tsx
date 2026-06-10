@@ -249,7 +249,7 @@ export function AdminPage() {
                         : 'bg-yellow-50 border-yellow-200'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-2">
                       <div>
                         <p className="font-medium text-sm">{invite.email}</p>
                         <p className="text-xs text-gray-600">
@@ -266,6 +266,11 @@ export function AdminPage() {
                         {invite.status === 'accepted' ? '✓ Accepted' : 'Pending'}
                       </span>
                     </div>
+                    {invite.status === 'sent' && (
+                      <div className="text-xs bg-white bg-opacity-50 p-2 rounded font-mono break-all">
+                        Token: {invite.token}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
