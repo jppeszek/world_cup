@@ -71,7 +71,10 @@ export function LoginPage() {
         </form>
 
         <p className="text-center text-gray-600 text-sm mt-6">
-          Need an invite? Contact the administrator.
+          Don't have an account?{' '}
+          <a href="/register" className="text-blue-600 hover:underline">
+            Register with invite token
+          </a>
         </p>
       </div>
     </div>
