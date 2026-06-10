@@ -200,4 +200,52 @@ router.post('/reset-password', async (req: Request, res: Response) => {
   res.json({ message: 'Password reset not yet implemented' });
 });
 
+// POST /api/auth/bootstrap - Create first admin and invite (one-time setup)
+router.post('/bootstrap', async (req: Request, res: Response) => {
+  try {
+    // Check if any admin exists
+    const adminCheck = await query('SELECT id FROM users WHERE is_admin = true LIMIT 1');
+    if (adminCheck.rows.length > 0) {
+      return res.status(400).json({ error: 'Admin already exists' });
+    }
+
+    // Create admin user
+    const adminPassword = await hashPassword('admin123!');
+    const adminToken = generateRandomToken();
+
+    const userResult = await query(
+      `INSERT INTO users (nickname, email, password_hash, is_admin)
+       VALUES ($1, $2, $3, true)
+       RETURNING id, nickname, email`,
+      ['admin', 'admin@example.com', adminPassword]
+    );
+
+    const admin = userResult.rows[0];
+
+    // Create invite for testing
+    const inviteToken = generateRandomToken();
+    await query(
+      `INSERT INTO invites (email, token, invited_by, status, expires_at)
+       VALUES ($1, $2, $3, 'sent', NOW() + INTERVAL '30 days')`,
+      ['test@example.com', inviteToken, admin.id]
+    );
+
+    res.json({
+      message: 'Bootstrap complete',
+      admin: {
+        email: admin.email,
+        password: 'admin123!',
+        nickname: admin.nickname
+      },
+      testInvite: {
+        email: 'test@example.com',
+        token: inviteToken
+      }
+    });
+  } catch (error) {
+    console.error('Bootstrap error:', error);
+    res.status(500).json({ error: 'Bootstrap failed' });
+  }
+});
+
 export default router;
