@@ -4,7 +4,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd /opt/render/project && cd frontend && npm install && VITE_API_URL=/api npm run build && cd ../backend && npm install && npm run build
+    buildCommand: cd .. && cd frontend && npm install && VITE_API_URL=/api npm run build && cd ../backend && npm install && npm run build
     startCommand: cd backend && npm run start
     envVars:
       - key: NODE_ENV
