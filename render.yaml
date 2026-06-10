@@ -4,7 +4,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd backend && npm ci && npm run build && npx tsx scripts/seedFixtures.ts
+    buildCommand: cd frontend && npm ci && VITE_API_URL=/api npm run build && cd ../backend && npm ci && npm run build
     startCommand: cd backend && npm run start
     envVars:
       - key: NODE_ENV
@@ -17,16 +17,6 @@ services:
         generateValue: true
       - key: PORT
         value: 5000
-      - key: FRONTEND_URL
-        value: https://world-cup.onrender.com
-
-  - type: static
-    name: world-cup-frontend
-    buildCommand: cd frontend && npm ci && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://world-cup-backend-wrbs.onrender.com
 
 databases:
   - name: world-cup-db

@@ -15,6 +15,7 @@ import predictionRoutes from './routes/predictions.js';
 import leaderboardRoutes from './routes/leaderboard.js';
 import adminRoutes from './routes/admin.js';
 import { seedFixtures } from '../scripts/seedFixtures.js';
+import { existsSync } from 'fs';
 
 dotenv.config();
 
@@ -24,8 +25,14 @@ const PostgresqlStore = pgSession(session);
 
 // Middleware
 app.use(helmet());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5555',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5555', process.env.FRONTEND_URL || 'http://localhost:5173'],
+  origin: allowedOrigins.length > 0 ? allowedOrigins : true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -69,10 +76,24 @@ app.use('/api/predictions', predictionRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/admin', adminRoutes);
 
-// 404 handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ error: 'Not found' });
-});
+// Serve static frontend files
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendPath = resolve(__dirname, '../../frontend/dist');
+
+if (existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
+
+  // SPA fallback: serve index.html for non-API routes
+  app.get('*', (req: Request, res: Response) => {
+    res.sendFile(resolve(frontendPath, 'index.html'));
+  });
+} else {
+  // 404 handler (when frontend not built)
+  app.use((req: Request, res: Response) => {
+    res.status(404).json({ error: 'Not found' });
+  });
+}
 
 // Error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
