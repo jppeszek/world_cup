@@ -23,15 +23,15 @@ client.interceptors.response.use(
 export const api = {
   // Auth
   register: (data: { token: string; email: string; nickname: string; password: string }) =>
-    client.post('/api/auth/register', data),
-  login: (data: { email: string; password: string }) => client.post('/api/auth/login', data),
-  logout: () => client.post('/api/auth/logout'),
-  me: () => client.get('/api/auth/me'),
+    client.post('/auth/register', data),
+  login: (data: { email: string; password: string }) => client.post('/auth/login', data),
+  logout: () => client.post('/auth/logout'),
+  me: () => client.get('/auth/me'),
 
   // Matches
   getMatches: (params?: { status?: string; daysOffset?: number }) =>
-    client.get('/api/matches', { params }),
-  getMatch: (id: number) => client.get(`/api/matches/${id}`),
+    client.get('/matches', { params }),
+  getMatch: (id: number) => client.get(`/matches/${id}`),
 
   // Predictions
   createPrediction: (data: {
@@ -39,22 +39,22 @@ export const api = {
     pred_home: number;
     pred_away: number;
     pred_winner?: 'home' | 'away';
-  }) => client.post('/api/predictions', data),
-  updatePrediction: (id: number, data: any) => client.put(`/api/predictions/${id}`, data),
-  getUserPredictions: () => client.get('/api/predictions/me/predictions'),
+  }) => client.post('/predictions', data),
+  updatePrediction: (id: number, data: any) => client.put(`/predictions/${id}`, data),
+  getUserPredictions: () => client.get('/predictions/me/predictions'),
 
   // Leaderboard
-  getLeaderboard: () => client.get('/api/leaderboard'),
-  getUserStats: () => client.get('/api/leaderboard/me/stats'),
+  getLeaderboard: () => client.get('/leaderboard'),
+  getUserStats: () => client.get('/leaderboard/me/stats'),
 
   // Admin
-  createInvite: (data: { email: string }) => client.post('/api/admin/invites', data),
-  getInvites: () => client.get('/api/admin/invites'),
-  importResults: () => client.post('/api/admin/import-results'),
+  createInvite: (data: { email: string }) => client.post('/admin/invites', data),
+  getInvites: () => client.get('/admin/invites'),
+  importResults: () => client.post('/admin/import-results'),
   setMatchScore: (matchId: number, data: { score_home: number; score_away: number }) =>
-    client.put(`/api/admin/matches/${matchId}/score`, data),
+    client.put(`/admin/matches/${matchId}/score`, data),
   updateMatchTeams: (matchId: number, data: { team_home: string; team_away: string }) =>
-    client.put(`/api/admin/matches/${matchId}/teams`, data),
+    client.put(`/admin/matches/${matchId}/teams`, data),
 };
 
 export default client;
