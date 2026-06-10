@@ -4,7 +4,11 @@ import cors from 'cors';
 import session from 'express-session';
 import pgSession from 'connect-pg-simple';
 import dotenv from 'dotenv';
-import pool from './db.js';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import pool, { getClient } from './db.js';
 import authRoutes from './routes/auth.js';
 import matchRoutes from './routes/matches.js';
 import predictionRoutes from './routes/predictions.js';
@@ -77,8 +81,34 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+// Run migrations on startup
+async function runMigrations() {
+  const client = await getClient();
+  try {
+    console.log('Running database migrations...');
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const migrationPath = resolve(__dirname, '../migrations/001_init_schema.sql');
+    const sql = readFileSync(migrationPath, 'utf-8');
+    await client.query(sql);
+    console.log('✅ Migrations completed');
+  } catch (error) {
+    console.error('❌ Migration failed:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
-});
+runMigrations()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
