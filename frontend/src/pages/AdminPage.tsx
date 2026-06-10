@@ -128,6 +128,30 @@ export function AdminPage() {
     }
   };
 
+  const handleClearScore = async () => {
+    if (!selectedMatchId) {
+      setError('Select a match first');
+      return;
+    }
+
+    setSettingScore(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      await api.setMatchScore(selectedMatchId, { clear: true });
+      setSuccess('Score cleared');
+      setSelectedMatchId(null);
+      setScoreHome('');
+      setScoreAway('');
+      await loadMatches();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to clear score');
+    } finally {
+      setSettingScore(false);
+    }
+  };
+
   const handleImportResults = async () => {
     setError('');
     setSuccess('');
@@ -326,17 +350,31 @@ export function AdminPage() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={settingScore}
-              className={`w-full py-2 px-4 rounded-lg font-semibold text-white transition ${
-                settingScore
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700'
-              }`}
-            >
-              {settingScore ? 'Saving...' : 'Set Score'}
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={settingScore}
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold text-white transition ${
+                  settingScore
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {settingScore ? 'Saving...' : 'Set Score'}
+              </button>
+              <button
+                type="button"
+                disabled={settingScore || !selectedMatchId}
+                onClick={handleClearScore}
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold text-white transition ${
+                  settingScore || !selectedMatchId
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                {settingScore ? 'Saving...' : 'Clear Score'}
+              </button>
+            </div>
           </form>
 
           <p className="text-xs text-gray-500 mt-4">

@@ -213,7 +213,27 @@ router.get('/matches/:match_id/predictions', requireAdmin, async (req: Request, 
 // PUT /api/admin/matches/:match_id/score - Manually set match score (admin only)
 router.put('/matches/:match_id/score', requireAdmin, async (req: Request, res: Response) => {
   const matchId = parseInt(req.params.match_id);
-  const { score_home, score_away } = req.body;
+  const { score_home, score_away, clear } = req.body;
+
+  if (clear) {
+    // Clear the score
+    const updateResult = await query(
+      `UPDATE matches
+       SET score_home = NULL, score_away = NULL, status = 'open', result_imported_at = NULL, updated_at = NOW()
+       WHERE id = $1
+       RETURNING *`,
+      [matchId],
+    );
+
+    if (updateResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    return res.json({
+      message: 'Match score cleared',
+      match: updateResult.rows[0],
+    });
+  }
 
   if (score_home === undefined || score_away === undefined) {
     return res.status(400).json({ error: 'score_home and score_away required' });
