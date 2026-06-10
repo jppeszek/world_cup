@@ -200,6 +200,27 @@ router.post('/reset-password', async (req: Request, res: Response) => {
   res.json({ message: 'Password reset not yet implemented' });
 });
 
+// GET /api/auth/test-login - Debug: test login with admin credentials
+router.get('/test-login', async (req: Request, res: Response) => {
+  try {
+    const result = await query('SELECT * FROM users WHERE email = $1', ['admin@example.com']);
+    if (result.rows.length === 0) {
+      return res.json({ error: 'Admin user not found' });
+    }
+
+    const user = result.rows[0];
+    const valid = await comparePassword('admin123!', user.password_hash);
+
+    res.json({
+      user: { id: user.id, email: user.email, is_admin: user.is_admin },
+      passwordValid: valid,
+      storedHash: user.password_hash.substring(0, 20) + '...'
+    });
+  } catch (error) {
+    res.json({ error: String(error) });
+  }
+});
+
 // POST /api/auth/bootstrap - Create first admin and invite (one-time setup)
 router.post('/bootstrap', async (req: Request, res: Response) => {
   try {
