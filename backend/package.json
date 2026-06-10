@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "echo 'Build complete'",
-    "start": "tsx src/index.ts",
+    "start": "npx tsx src/index.ts",
     "migrate": "node scripts/migrate.js",
     "seed": "tsx scripts/seedFixtures.ts",
     "test": "jest --testPathPattern='(?<!integration)\\.test\\.ts$'",
