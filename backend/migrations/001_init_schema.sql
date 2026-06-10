@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
 -- Invites table
 CREATE TABLE IF NOT EXISTS invites (
@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS invites (
   expires_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP + INTERVAL '7 days'
 );
 
-CREATE INDEX idx_invites_token ON invites(token);
-CREATE INDEX idx_invites_email ON invites(email);
+CREATE INDEX IF NOT EXISTS idx_invites_token ON invites(token);
+CREATE INDEX IF NOT EXISTS idx_invites_email ON invites(email);
 
 -- Matches table
 CREATE TABLE IF NOT EXISTS matches (
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS matches (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_matches_kickoff_utc ON matches(kickoff_utc);
-CREATE INDEX idx_matches_status ON matches(status);
+CREATE INDEX IF NOT EXISTS idx_matches_kickoff_utc ON matches(kickoff_utc);
+CREATE INDEX IF NOT EXISTS idx_matches_status ON matches(status);
 
 -- Predictions table
 CREATE TABLE IF NOT EXISTS predictions (
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS predictions (
   UNIQUE(user_id, match_id)
 );
 
-CREATE INDEX idx_predictions_user_id ON predictions(user_id);
-CREATE INDEX idx_predictions_match_id ON predictions(match_id);
+CREATE INDEX IF NOT EXISTS idx_predictions_user_id ON predictions(user_id);
+CREATE INDEX IF NOT EXISTS idx_predictions_match_id ON predictions(match_id);
 
 -- Leaderboard cache table
 CREATE TABLE IF NOT EXISTS leaderboard_cache (
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS leaderboard_cache (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_leaderboard_cache_score ON leaderboard_cache(total_score DESC);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_score ON leaderboard_cache(total_score DESC);
 
 -- Session table for express-session
 CREATE TABLE IF NOT EXISTS "session" (
@@ -86,4 +86,4 @@ CREATE TABLE IF NOT EXISTS "session" (
   PRIMARY KEY ("sid")
 );
 
-CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
