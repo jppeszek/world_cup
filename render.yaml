@@ -4,7 +4,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd backend && npm ci && npm run build && npx tsx scripts/seedFixtures.ts
+    buildCommand: cd backend && npm ci && npm run build && psql $DATABASE_URL -f migrations/001_init_schema.sql && npx tsx scripts/seedFixtures.ts
     startCommand: cd backend && npm run start
     envVars:
       - key: NODE_ENV
