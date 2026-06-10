@@ -40,17 +40,14 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Session config
+// Session config - using memory store for now (temp fix for cookie issue)
 app.use(
   session({
-    store: new PostgresqlStore({
-      pool: pool,
-    }),
     secret: process.env.SESSION_SECRET || 'dev-secret-change-in-prod',
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Temp: disable secure cookie requirement
       httpOnly: true,
       sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
