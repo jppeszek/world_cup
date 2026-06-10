@@ -4,8 +4,9 @@ import { useAuth } from '../context/AuthContext';
 
 export function RegisterPage() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const urlToken = searchParams.get('token');
 
+  const [token, setToken] = useState(urlToken || '');
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
@@ -46,19 +47,6 @@ export function RegisterPage() {
     }
   };
 
-  if (!token) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md text-center">
-          <h1 className="text-3xl font-bold text-blue-600 mb-4">⚽ World Cup 2026</h1>
-          <p className="text-red-600 font-semibold">Invalid invitation link</p>
-          <p className="text-gray-600 mt-2">
-            Please check your email for the correct registration link.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
@@ -71,6 +59,19 @@ export function RegisterPage() {
               {error}
             </div>
           )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Invite Token</label>
+            <input
+              type="text"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="Paste your invite token"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Get this from your invite email or admin panel</p>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
