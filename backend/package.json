@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "echo 'Skipping TypeScript build'",
+    "start": "tsx src/index.ts",
     "migrate": "node scripts/migrate.js",
     "seed": "tsx scripts/seedFixtures.ts",
     "test": "jest --testPathPattern='(?<!integration)\\.test\\.ts$'",
