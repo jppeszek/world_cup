@@ -119,7 +119,7 @@ const FIXTURES_2026: Fixture[] = [
   { home: 'W101', away: 'W102', date: '2026-07-18', time: '23:00', venue: 'Miami Stadium', stage: 'final' },
 ];
 
-async function seedFixtures() {
+export async function seedFixtures() {
   try {
     console.log('🌍 Seeding 2026 World Cup fixtures (official schedule)...\n');
 
@@ -166,8 +166,10 @@ async function seedFixtures() {
     console.log(`   • Final: July 19`);
   } catch (error) {
     console.error('Error seeding fixtures:', error);
-    process.exit(1);
+    throw error;
   }
 }
 
-seedFixtures();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  seedFixtures().then(() => process.exit(0)).catch(() => process.exit(1));
+}

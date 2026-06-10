@@ -14,6 +14,7 @@ import matchRoutes from './routes/matches.js';
 import predictionRoutes from './routes/predictions.js';
 import leaderboardRoutes from './routes/leaderboard.js';
 import adminRoutes from './routes/admin.js';
+import { seedFixtures } from '../scripts/seedFixtures.js';
 
 dotenv.config();
 
@@ -101,14 +102,16 @@ async function runMigrations() {
 }
 
 // Start server
-runMigrations()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
-    });
-  })
-  .catch((error) => {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+async function startup() {
+  await runMigrations();
+  await seedFixtures();
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
   });
+}
+
+startup().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
