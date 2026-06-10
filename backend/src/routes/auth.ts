@@ -200,6 +200,16 @@ router.post('/reset-password', async (req: Request, res: Response) => {
   res.json({ message: 'Password reset not yet implemented' });
 });
 
+// GET /api/auth/session - Debug: check session state
+router.get('/session', (req: Request, res: Response) => {
+  res.json({
+    hasSession: !!req.session,
+    userId: req.session?.userId,
+    sessionId: req.sessionID,
+    cookies: req.headers.cookie || 'no cookies'
+  });
+});
+
 // GET /api/auth/test-login - Debug: test login with admin credentials
 router.get('/test-login', async (req: Request, res: Response) => {
   try {
