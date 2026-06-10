@@ -3,6 +3,7 @@ import { query } from '../db.js';
 import { requireAdmin, requireInternalToken } from '../middleware/auth.js';
 import { generateRandomToken } from '../utils/hash.js';
 import { scoreAllPredictionsForMatch } from '../services/scoringEngine.js';
+import { sendInviteEmail } from '../services/email.js';
 import fetch from 'node-fetch';
 import db from '../db.js';
 
@@ -48,9 +49,14 @@ router.post('/invites', requireAdmin, async (req: Request, res: Response) => {
 
     const invite = result.rows[0];
 
-    // TODO: Send email in Phase 2
-    const inviteUrl = `${process.env.FRONTEND_URL}/register?token=${token}`;
-    console.log(`Invite created for ${email}: ${inviteUrl}`);
+    // Send invite email
+    const inviteUrl = `${process.env.FRONTEND_URL || 'https://world-cup-backend-wrbs.onrender.com'}/register`;
+    try {
+      await sendInviteEmail(email, token, inviteUrl);
+    } catch (emailError) {
+      console.error('Failed to send invite email:', emailError);
+      // Continue anyway - invite was created
+    }
 
     res.status(201).json({
       invite: {
