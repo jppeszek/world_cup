@@ -70,7 +70,7 @@ router.post('/invites', requireAdmin, async (req: Request, res: Response) => {
 router.get('/invites', requireAdmin, async (req: Request, res: Response) => {
   try {
     const result = await query(
-      `SELECT id, email, status, created_at, accepted_at
+      `SELECT id, email, token, status, created_at, accepted_at
        FROM invites
        ORDER BY created_at DESC`,
     );
