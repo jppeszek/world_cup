@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: cd frontend && npm install --include=dev --no-audit && VITE_API_URL=/api npm run build && cd ../backend && npm install --include=dev && npm run build
-    startCommand: cd backend && npm run start
+    startCommand: cd backend && npm install --include=dev --no-audit && npm run start
     envVars:
       - key: NODE_ENV
         value: production
