@@ -229,8 +229,16 @@ router.put('/matches/:match_id/score', requireAdmin, async (req: Request, res: R
       return res.status(404).json({ error: 'Match not found' });
     }
 
+    // Clear all prediction scores for this match
+    await query(
+      `UPDATE predictions
+       SET points = NULL, updated_at = NOW()
+       WHERE match_id = $1`,
+      [matchId],
+    );
+
     return res.json({
-      message: 'Match score cleared',
+      message: 'Match score cleared and all predictions rescored',
       match: updateResult.rows[0],
     });
   }
