@@ -20,6 +20,14 @@ services:
       - key: FRONTEND_URL
         value: https://world-cup.onrender.com
 
+  - type: static
+    name: world-cup-frontend
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://world-cup-backend-wrbs.onrender.com
+
 databases:
   - name: world-cup-db
     plan: free
