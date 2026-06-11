@@ -76,6 +76,10 @@ export function LoginPage() {
             Register with invite token
           </a>
         </p>
+
+        <p className="text-center text-gray-500 text-xs mt-8">
+          Apologies for bugs, we are testing on the fly :-)
+        </p>
       </div>
     </div>
   );
