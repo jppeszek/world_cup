@@ -38,28 +38,20 @@ export function PredictionsPage() {
       setError('');
       const response = await api.getMatches({ status: 'finished' });
       console.log('Full response:', response);
-      console.log('response.matches type:', typeof response.matches);
-      console.log('Is array?', Array.isArray(response.matches));
 
-      // API returns matches grouped by date, flatten them
-      const matchesObj = response.matches;
+      // API returns response.data.matches (axios wraps the response)
+      const matchesObj = response.data?.matches || response.matches;
       let allMatches: Match[] = [];
 
       if (matchesObj && typeof matchesObj === 'object' && !Array.isArray(matchesObj)) {
         // Grouped by date
-        console.log('Grouped by date, keys:', Object.keys(matchesObj));
         allMatches = Object.values(matchesObj).flat();
-        console.log('Individual match data:');
-        allMatches.forEach((m: any) => {
-          console.log(`${m.team_home} vs ${m.team_away}: scores=${m.score_home}-${m.score_away}, status=${m.status}`);
-        });
+        console.log('Finished matches found:', allMatches.length);
       } else if (Array.isArray(matchesObj)) {
         // Already an array
         allMatches = matchesObj;
       }
 
-      console.log('Flattened matches count:', allMatches.length);
-      console.log('Flattened matches:', allMatches);
       setMatches(allMatches);
       setLoading(false);
     } catch (error) {
