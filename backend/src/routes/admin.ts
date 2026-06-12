@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { query } from '../db.js';
-import { requireAdmin, requireInternalToken } from '../middleware/auth.js';
+import { requireAdmin, requireAuth, requireInternalToken } from '../middleware/auth.js';
 import { generateRandomToken } from '../utils/hash.js';
 import { scoreAllPredictionsForMatch } from '../services/scoringEngine.js';
 import { sendInviteEmail } from '../services/email.js';
@@ -188,8 +188,8 @@ router.post('/import-results', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/admin/matches/:match_id/predictions - Get all predictions for a match
-router.get('/matches/:match_id/predictions', requireAdmin, async (req: Request, res: Response) => {
+// GET /api/admin/matches/:match_id/predictions - Get all predictions for a match (public)
+router.get('/matches/:match_id/predictions', requireAuth, async (req: Request, res: Response) => {
   const matchId = parseInt(req.params.match_id);
 
   try {
