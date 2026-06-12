@@ -67,8 +67,13 @@ export function PredictionsPage() {
 
     try {
       const response = await api.getMatchPredictions(matchId);
-      console.log('Predictions:', response.predictions);
-      setPredictions(response.predictions || []);
+      console.log('Full predictions response:', response);
+      console.log('response.data:', response.data);
+      console.log('response.predictions:', response.predictions);
+
+      const preds = response.data?.predictions || response.predictions || [];
+      console.log('Extracted predictions:', preds);
+      setPredictions(preds);
       setSelectedMatchId(matchId);
     } catch (error) {
       console.error('Failed to load predictions:', error);
