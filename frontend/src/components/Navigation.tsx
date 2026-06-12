@@ -34,6 +34,9 @@ export function Navigation() {
               <Link to="/stats" className="hover:text-blue-200">
                 My Stats
               </Link>
+              <Link to="/predictions" className="hover:text-blue-200">
+                Predictions
+              </Link>
               {user.is_admin && (
                 <Link to="/admin" className="hover:text-blue-200 font-semibold">
                   Admin

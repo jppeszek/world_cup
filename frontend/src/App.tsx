@@ -8,6 +8,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { MatchesPage } from './pages/MatchesPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { StatsPage } from './pages/StatsPage';
+import { PredictionsPage } from './pages/PredictionsPage';
 import { AdminPage } from './pages/AdminPage';
 
 function AppRoutes() {
@@ -48,6 +49,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <StatsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/predictions"
+          element={
+            <ProtectedRoute>
+              <PredictionsPage />
             </ProtectedRoute>
           }
         />
