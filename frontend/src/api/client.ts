@@ -57,6 +57,8 @@ export const api = {
     client.put(`/admin/matches/${matchId}/teams`, data),
   updateMatchKickoff: (matchId: number, data: { kickoff_utc: string }) =>
     client.put(`/admin/matches/${matchId}/kickoff`, data),
+  getMatchPredictions: (matchId: number) =>
+    client.get(`/admin/matches/${matchId}/predictions`),
 };
 
 export default client;

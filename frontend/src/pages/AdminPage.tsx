@@ -45,6 +45,11 @@ export function AdminPage() {
   const [editingTeams, setEditingTeams] = useState(false);
   const [editingKickoff, setEditingKickoff] = useState(false);
 
+  // Predictions view state
+  const [selectedPredictionsMatchId, setSelectedPredictionsMatchId] = useState<number | null>(null);
+  const [predictions, setPredictions] = useState<any[]>([]);
+  const [loadingPredictions, setLoadingPredictions] = useState(false);
+
   useEffect(() => {
     loadInvites();
     loadMatches();
@@ -231,6 +236,21 @@ export function AdminPage() {
       setError(err.response?.data?.error || 'Failed to update kickoff time');
     } finally {
       setEditingKickoff(false);
+    }
+  };
+
+  const loadPredictions = async (matchId: number) => {
+    setLoadingPredictions(true);
+    setError('');
+
+    try {
+      const response = await api.getMatchPredictions(matchId);
+      setPredictions(response.predictions);
+      setSelectedPredictionsMatchId(matchId);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to load predictions');
+    } finally {
+      setLoadingPredictions(false);
     }
   };
 
@@ -587,6 +607,76 @@ export function AdminPage() {
           <p className="text-xs text-gray-500 mt-4">
             💡 This runs automatically every 5 minutes during the tournament via GitHub Actions.
             You can manually trigger it here anytime.
+          </p>
+        </div>
+
+        {/* View Predictions for Finished Matches */}
+        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <h2 className="text-2xl font-bold mb-4">Predictions for Finished Matches</h2>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Select a finished match</label>
+            <select
+              value={selectedPredictionsMatchId || ''}
+              onChange={(e) => {
+                const matchId = e.target.value ? parseInt(e.target.value) : null;
+                if (matchId) {
+                  loadPredictions(matchId);
+                } else {
+                  setSelectedPredictionsMatchId(null);
+                  setPredictions([]);
+                }
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Choose a match...</option>
+              {matches
+                .filter(m => m.status === 'finished')
+                .map((match) => (
+                  <option key={match.id} value={match.id}>
+                    {match.team_home} {match.score_home}-{match.score_away} {match.team_away}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {loadingPredictions && <p className="text-center text-gray-600">Loading predictions...</p>}
+
+          {selectedPredictionsMatchId && !loadingPredictions && predictions.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-100 border-b">
+                    <th className="text-left px-4 py-2 font-semibold">User</th>
+                    <th className="text-center px-4 py-2 font-semibold">Prediction</th>
+                    <th className="text-center px-4 py-2 font-semibold">Actual Score</th>
+                    <th className="text-center px-4 py-2 font-semibold">Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {predictions.map((pred) => (
+                    <tr key={pred.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium">{pred.nickname}</td>
+                      <td className="text-center px-4 py-3">{pred.pred_home}-{pred.pred_away}</td>
+                      <td className="text-center px-4 py-3 font-semibold">{pred.score_home}-{pred.score_away}</td>
+                      <td className={`text-center px-4 py-3 font-bold ${
+                        pred.points === 3 ? 'text-green-600' : pred.points === 1 ? 'text-blue-600' : 'text-gray-400'
+                      }`}>
+                        {pred.points || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {selectedPredictionsMatchId && !loadingPredictions && predictions.length === 0 && (
+            <p className="text-center text-gray-500 py-4">No predictions for this match</p>
+          )}
+
+          <p className="text-xs text-gray-500 mt-4">
+            💡 View all user predictions for finished matches. Points: 3 for exact score, 1 for correct outcome.
           </p>
         </div>
       </div>
