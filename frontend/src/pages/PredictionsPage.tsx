@@ -27,6 +27,7 @@ export function PredictionsPage() {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPredictions, setLoadingPredictions] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     loadMatches();
@@ -34,24 +35,30 @@ export function PredictionsPage() {
 
   const loadMatches = async () => {
     try {
+      setError('');
       const response = await api.getMatches({ status: 'finished' });
-      setMatches(response.matches);
+      console.log('Finished matches:', response.matches);
+      setMatches(response.matches || []);
       setLoading(false);
     } catch (error) {
       console.error('Failed to load matches:', error);
+      setError('Failed to load matches');
       setLoading(false);
     }
   };
 
   const loadPredictions = async (matchId: number) => {
     setLoadingPredictions(true);
+    setError('');
 
     try {
       const response = await api.getMatchPredictions(matchId);
-      setPredictions(response.predictions);
+      console.log('Predictions:', response.predictions);
+      setPredictions(response.predictions || []);
       setSelectedMatchId(matchId);
     } catch (error) {
       console.error('Failed to load predictions:', error);
+      setError('Failed to load predictions');
     } finally {
       setLoadingPredictions(false);
     }
@@ -71,6 +78,12 @@ export function PredictionsPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold text-blue-900 mb-8">Predictions by Match</h1>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
 
         {matches.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
