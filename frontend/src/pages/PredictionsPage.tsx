@@ -37,8 +37,22 @@ export function PredictionsPage() {
     try {
       setError('');
       const response = await api.getMatches({ status: 'finished' });
-      console.log('Finished matches:', response.matches);
-      setMatches(response.matches || []);
+      console.log('Full response:', response);
+
+      // API returns matches grouped by date, flatten them
+      const matchesObj = response.matches;
+      let allMatches: Match[] = [];
+
+      if (matchesObj && typeof matchesObj === 'object' && !Array.isArray(matchesObj)) {
+        // Grouped by date
+        allMatches = Object.values(matchesObj).flat();
+      } else if (Array.isArray(matchesObj)) {
+        // Already an array
+        allMatches = matchesObj;
+      }
+
+      console.log('Flattened matches:', allMatches);
+      setMatches(allMatches);
       setLoading(false);
     } catch (error) {
       console.error('Failed to load matches:', error);
