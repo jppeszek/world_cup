@@ -38,7 +38,12 @@ export function AdminPage() {
   const [editingTeamsMatchId, setEditingTeamsMatchId] = useState<number | null>(null);
   const [editTeamHome, setEditTeamHome] = useState('');
   const [editTeamAway, setEditTeamAway] = useState('');
+
+  // Kickoff edit state
+  const [editingKickoffMatchId, setEditingKickoffMatchId] = useState<number | null>(null);
+  const [editKickoffTime, setEditKickoffTime] = useState('');
   const [editingTeams, setEditingTeams] = useState(false);
+  const [editingKickoff, setEditingKickoff] = useState(false);
 
   useEffect(() => {
     loadInvites();
@@ -199,6 +204,33 @@ export function AdminPage() {
       setError(err.response?.data?.error || 'Failed to update teams');
     } finally {
       setEditingTeams(false);
+    }
+  };
+
+  const handleUpdateKickoff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!editingKickoffMatchId || !editKickoffTime) {
+      setError('Kickoff time required');
+      return;
+    }
+
+    setEditingKickoff(true);
+
+    try {
+      await api.updateMatchKickoff(editingKickoffMatchId, {
+        kickoff_utc: editKickoffTime,
+      });
+      setSuccess(`Kickoff time updated`);
+      setEditingKickoffMatchId(null);
+      setEditKickoffTime('');
+      await loadMatches();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to update kickoff time');
+    } finally {
+      setEditingKickoff(false);
     }
   };
 
@@ -454,6 +486,71 @@ export function AdminPage() {
 
           <p className="text-xs text-gray-500 mt-4">
             💡 Use this to rename knockout matches with actual team names (e.g., "Winner A" → "Argentina").
+          </p>
+        </div>
+
+        {/* Edit Match Kickoff Time */}
+        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <h2 className="text-2xl font-bold mb-4">Edit Match Kickoff Time</h2>
+
+          <form onSubmit={handleUpdateKickoff} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Match</label>
+              <select
+                value={editingKickoffMatchId || ''}
+                onChange={(e) => {
+                  const matchId = e.target.value ? parseInt(e.target.value) : null;
+                  if (matchId) {
+                    const match = matches.find(m => m.id === matchId);
+                    if (match) {
+                      setEditingKickoffMatchId(matchId);
+                      setEditKickoffTime(match.kickoff_utc);
+                    }
+                  } else {
+                    setEditingKickoffMatchId(null);
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Choose a match...</option>
+                {matches.map((match) => (
+                  <option key={match.id} value={match.id}>
+                    {match.team_home} vs {match.team_away} ({new Date(match.kickoff_utc).toLocaleString()})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {editingKickoffMatchId && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Kickoff Time (UTC)</label>
+                  <input
+                    type="datetime-local"
+                    value={editKickoffTime.slice(0, 16)}
+                    onChange={(e) => setEditKickoffTime(e.target.value + ':00Z')}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Format: YYYY-MM-DDTHH:MM:SSZ</p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={editingKickoff}
+                  className={`w-full py-2 px-4 rounded-lg font-semibold text-white transition ${
+                    editingKickoff
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                >
+                  {editingKickoff ? 'Updating...' : 'Update Kickoff Time'}
+                </button>
+              </>
+            )}
+          </form>
+
+          <p className="text-xs text-gray-500 mt-4">
+            💡 Fix incorrect match times without affecting scores.
           </p>
         </div>
 

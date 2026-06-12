@@ -308,6 +308,38 @@ router.put('/matches/:match_id/teams', requireAdmin, async (req: Request, res: R
   }
 });
 
+// PUT /api/admin/matches/:match_id/kickoff - Manually edit match kickoff time (admin only)
+router.put('/matches/:match_id/kickoff', requireAdmin, async (req: Request, res: Response) => {
+  const matchId = parseInt(req.params.match_id);
+  const { kickoff_utc } = req.body;
+
+  if (!kickoff_utc) {
+    return res.status(400).json({ error: 'kickoff_utc required' });
+  }
+
+  try {
+    const updateResult = await query(
+      `UPDATE matches
+       SET kickoff_utc = $1, updated_at = NOW()
+       WHERE id = $2
+       RETURNING *`,
+      [kickoff_utc, matchId],
+    );
+
+    if (updateResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    res.json({
+      message: 'Match kickoff time updated',
+      match: updateResult.rows[0],
+    });
+  } catch (error) {
+    console.error('Update match kickoff error:', error);
+    res.status(500).json({ error: 'Failed to update match kickoff time' });
+  }
+});
+
 // GET /api/admin/leaderboard - Get full leaderboard (admin only)
 router.get('/leaderboard', requireAdmin, async (req: Request, res: Response) => {
   try {
