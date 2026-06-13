@@ -267,11 +267,11 @@ export function MatchesPage() {
                           </div>
                         </div>
 
-                        {parseInt(formData.home) > parseInt(formData.away) ||
-                        parseInt(formData.away) > parseInt(formData.home) ? (
+                        {parseInt(formData.home) === parseInt(formData.away) &&
+                        match.stage !== 'group' ? (
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
-                              I predict...
+                              In case of draw, who wins? (extra time/penalties)
                             </label>
                             <select
                               value={formData.winner}
@@ -285,11 +285,7 @@ export function MatchesPage() {
                               <option value="away">{match.team_away} wins</option>
                             </select>
                           </div>
-                        ) : (
-                          <p className="text-xs text-gray-600">
-                            Equal score - winner will be determined by extra time/penalties
-                          </p>
-                        )}
+                        ) : null}
 
                         <div className="flex gap-2">
                           <button
