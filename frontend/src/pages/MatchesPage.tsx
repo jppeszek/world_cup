@@ -274,7 +274,7 @@ export function MatchesPage() {
                         match.stage !== 'group' ? (
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
-                              In case of draw, who wins? (extra time/penalties)
+                              In case of draw in extra time who wins on penalties
                             </label>
                             <select
                               value={formData.winner}
