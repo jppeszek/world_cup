@@ -36,7 +36,10 @@ export function MatchesPage() {
   useEffect(() => {
     loadMatches();
     loadPredictions();
-    const interval = setInterval(() => setMatchesByDate({ ...matchesByDate }), 30000);
+    // Refresh time display every 30 seconds without re-fetching data
+    const interval = setInterval(() => {
+      setMatchesByDate(prev => ({ ...prev }));
+    }, 30000);
     return () => clearInterval(interval);
   }, [user?.id]); // Reload when user changes
 
