@@ -80,6 +80,10 @@ export function LoginPage() {
         <p className="text-center text-gray-500 text-xs mt-8">
           Apologies for bugs, we are testing on the fly :-)
         </p>
+
+        <div className="flex justify-center mt-8">
+          <img src="/candeo-logo-v3.svg" alt="Candeo Logo" className="h-12" />
+        </div>
       </div>
     </div>
   );

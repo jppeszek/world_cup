@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 160" width="420" height="160">
+  <defs>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B2B"/>
+      <stop offset="50%" stop-color="#FFAB00"/>
+      <stop offset="100%" stop-color="#FFD84A"/>
+    </linearGradient>
+    <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF5D0"/>
+      <stop offset="60%" stop-color="#FFAB00"/>
+      <stop offset="100%" stop-color="#FF6B2B"/>
+    </radialGradient>
+    <filter id="warmGlow">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Clean white background -->
+  <rect width="420" height="160" fill="#FFFFFF" rx="12"/>
+
+  <!-- Light warm blush circle behind icon -->
+  <circle cx="74" cy="80" r="50" fill="#FFF8EE"/>
+
+  <!-- Sunburst rays (8 rays) -->
+  <g transform="translate(74, 80)" filter="url(#warmGlow)">
+    <!-- Ray lines outward -->
+    <line x1="0" y1="-28" x2="0" y2="-42" stroke="url(#sunGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="0" y1="28" x2="0" y2="42" stroke="url(#sunGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="-28" y1="0" x2="-42" y2="0" stroke="url(#sunGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="28" y1="0" x2="42" y2="0" stroke="url(#sunGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- Diagonal rays (shorter) -->
+    <line x1="19.8" y1="-19.8" x2="29.7" y2="-29.7" stroke="url(#sunGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="-19.8" y1="-19.8" x2="-29.7" y2="-29.7" stroke="url(#sunGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="19.8" y1="19.8" x2="29.7" y2="29.7" stroke="url(#sunGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="-19.8" y1="19.8" x2="-29.7" y2="29.7" stroke="url(#sunGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <!-- Core circle -->
+    <circle cx="0" cy="0" r="18" fill="url(#coreGrad)"/>
+    <!-- Inner highlight -->
+    <circle cx="-5" cy="-5" r="5" fill="#FFFFFF" opacity="0.45"/>
+  </g>
+
+  <!-- Thin divider -->
+  <line x1="124" y1="55" x2="124" y2="105" stroke="#FFAB00" stroke-width="0.8" opacity="0.35"/>
+
+  <!-- Wordmark -->
+  <text
+    x="140" y="90"
+    font-family="'Futura', 'Century Gothic', 'Avenir', sans-serif"
+    font-size="40"
+    font-weight="300"
+    letter-spacing="8"
+    fill="#1C1C1C"
+  >CANDEO</text>
+
+  <!-- Tagline -->
+  <text
+    x="141" y="112"
+    font-family="'Futura', 'Century Gothic', 'Avenir', sans-serif"
+    font-size="8"
+    font-weight="500"
+    letter-spacing="5.5"
+    fill="#FF6B2B"
+    opacity="0.8"
+  >SHINE FORWARD</text>
+</svg>
