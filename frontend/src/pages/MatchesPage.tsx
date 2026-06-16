@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import { formatMatchTime, formatTimeUntilKickoff, getTimeUntilKickoff } from '../utils/timezone';
@@ -32,6 +32,7 @@ export function MatchesPage() {
   const [editingMatchId, setEditingMatchId] = useState<number | null>(null);
   const [formData, setFormData] = useState({ home: '', away: '', winner: '' });
   const { user } = useAuth();
+  const dateRefs = useRef<{ [key: string]: HTMLDivElement }>({});
 
   useEffect(() => {
     loadMatches();
@@ -42,6 +43,17 @@ export function MatchesPage() {
     }, 30000);
     return () => clearInterval(interval);
   }, [user?.id]); // Reload when user changes
+
+  // Scroll to current date when matches load
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const dateRef = dateRefs.current[today];
+    if (dateRef) {
+      setTimeout(() => {
+        dateRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [matchesByDate]);
 
   const loadMatches = async () => {
     try {
@@ -169,7 +181,13 @@ export function MatchesPage() {
         <p className="text-gray-500 text-center py-8">No matches found</p>
       ) : (
         dates.map((date) => (
-          <div key={date} className="mb-8">
+          <div
+            key={date}
+            ref={(el) => {
+              if (el) dateRefs.current[date] = el;
+            }}
+            className="mb-8"
+          >
             <h2 className="text-xl font-semibold mb-4 text-gray-800">
               {new Date(date).toLocaleDateString('en-US', {
                 weekday: 'long',
