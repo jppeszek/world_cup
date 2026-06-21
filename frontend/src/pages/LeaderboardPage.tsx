@@ -8,6 +8,7 @@ interface LeaderboardEntry {
   total_score: number;
   exact_score_hits: number;
   rank: number;
+  position_change?: number;
 }
 
 export function LeaderboardPage() {
@@ -25,7 +26,26 @@ export function LeaderboardPage() {
   const loadLeaderboard = async () => {
     try {
       const response = await api.getLeaderboard();
-      setLeaderboard(response.data.leaderboard);
+      const currentLeaderboard = response.data.leaderboard;
+
+      // Get previous leaderboard from localStorage
+      const storedLeaderboard = localStorage.getItem('leaderboard');
+      const previousLeaderboard = storedLeaderboard ? JSON.parse(storedLeaderboard) : null;
+
+      // Calculate position changes
+      const leaderboardWithChanges = currentLeaderboard.map((entry: LeaderboardEntry) => {
+        if (!previousLeaderboard) {
+          return { ...entry, position_change: 0 };
+        }
+        const previousEntry = previousLeaderboard.find((p: LeaderboardEntry) => p.user_id === entry.user_id);
+        const change = previousEntry ? previousEntry.rank - entry.rank : 0;
+        return { ...entry, position_change: change };
+      });
+
+      setLeaderboard(leaderboardWithChanges);
+
+      // Store current leaderboard for next comparison
+      localStorage.setItem('leaderboard', JSON.stringify(currentLeaderboard));
     } catch (err) {
       setError('Failed to load leaderboard');
     } finally {
@@ -60,6 +80,7 @@ export function LeaderboardPage() {
               <tr>
                 <th className="px-4 py-3 text-left">#</th>
                 <th className="px-4 py-3 text-left">Player</th>
+                <th className="px-4 py-3 text-center">Change</th>
                 <th className="px-4 py-3 text-right">Score</th>
                 <th className="px-4 py-3 text-right">Exact Predictions</th>
               </tr>
@@ -80,6 +101,19 @@ export function LeaderboardPage() {
                   <td className="px-4 py-3">
                     {entry.nickname}
                     {user?.id === entry.user_id && <span className="ml-2 text-sm text-gray-600">(You)</span>}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {entry.position_change && entry.position_change > 0 ? (
+                      <span className="text-green-600 font-semibold">
+                        ↑ +{entry.position_change}
+                      </span>
+                    ) : entry.position_change && entry.position_change < 0 ? (
+                      <span className="text-red-600 font-semibold">
+                        ↓ {entry.position_change}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-xl font-bold text-blue-600">{entry.total_score}</span>
