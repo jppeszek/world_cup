@@ -16,7 +16,7 @@ export function Navigation() {
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-md">
+    <nav className="sticky top-0 z-50 bg-blue-600 text-white shadow-md">
       <div className="container">
         <div className="flex items-center justify-between py-4">
           <Link to="/" className="text-2xl font-bold">
