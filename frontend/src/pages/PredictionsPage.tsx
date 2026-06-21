@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../api/client';
 
 interface Prediction {
@@ -28,10 +28,26 @@ export function PredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingPredictions, setLoadingPredictions] = useState(false);
   const [error, setError] = useState('');
+  const matchesListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadMatches();
   }, []);
+
+  useEffect(() => {
+    if (!loading && matches.length > 0) {
+      const latestMatch = matches.reduce((latest, current) =>
+        new Date(current.kickoff_utc) > new Date(latest.kickoff_utc) ? current : latest
+      );
+      loadPredictions(latestMatch.id);
+      setTimeout(() => {
+        const latestButton = matchesListRef.current?.querySelector(
+          `[data-match-id="${latestMatch.id}"]`
+        );
+        latestButton?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+  }, [loading]);
 
   const loadMatches = async () => {
     try {
@@ -114,10 +130,11 @@ export function PredictionsPage() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow p-6 border border-gray-200 h-fit">
                 <h2 className="text-xl font-bold mb-4 text-gray-800">Finished Matches</h2>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
+                <div ref={matchesListRef} className="space-y-2 max-h-96 overflow-y-auto">
                   {matches.map((match) => (
                     <button
                       key={match.id}
+                      data-match-id={match.id}
                       onClick={() => loadPredictions(match.id)}
                       className={`w-full text-left p-3 rounded-lg transition ${
                         selectedMatchId === match.id
