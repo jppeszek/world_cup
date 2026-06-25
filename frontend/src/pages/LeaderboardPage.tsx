@@ -7,6 +7,7 @@ interface LeaderboardEntry {
   nickname: string;
   total_score: number;
   exact_score_hits: number;
+  matches_predicted: number;
   rank: number;
   position_change?: number;
 }
@@ -95,6 +96,7 @@ export function LeaderboardPage() {
                 <th className="px-4 py-3 text-left">Player</th>
                 <th className="px-4 py-3 text-center">Change</th>
                 <th className="px-4 py-3 text-right">Score</th>
+                <th className="px-4 py-3 text-right">Predictions</th>
                 <th className="px-4 py-3 text-right">Exact Predictions</th>
               </tr>
             </thead>
@@ -131,6 +133,7 @@ export function LeaderboardPage() {
                   <td className="px-4 py-3 text-right">
                     <span className="text-xl font-bold text-blue-600">{entry.total_score}</span>
                   </td>
+                  <td className="px-4 py-3 text-right text-gray-600">{entry.matches_predicted}</td>
                   <td className="px-4 py-3 text-right text-gray-600">{entry.exact_score_hits}</td>
                 </tr>
               ))}
