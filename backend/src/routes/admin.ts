@@ -4,6 +4,7 @@ import { requireAdmin, requireAuth, requireInternalToken } from '../middleware/a
 import { generateRandomToken } from '../utils/hash.js';
 import { scoreAllPredictionsForMatch } from '../services/scoringEngine.js';
 import { sendInviteEmail } from '../services/email.js';
+import { getPenaltyWinner, savePenaltyWinner, clearPenaltyWinner } from '../services/penaltyWinners.js';
 import fetch from 'node-fetch';
 import db from '../db.js';
 
@@ -213,7 +214,7 @@ router.get('/matches/:match_id/predictions', requireAuth, async (req: Request, r
 // PUT /api/admin/matches/:match_id/score - Manually set match score (admin only)
 router.put('/matches/:match_id/score', requireAdmin, async (req: Request, res: Response) => {
   const matchId = parseInt(req.params.match_id);
-  const { score_home, score_away, clear } = req.body;
+  const { score_home, score_away, clear, penalty_winner } = req.body;
 
   if (clear) {
     // Clear the score
@@ -236,6 +237,13 @@ router.put('/matches/:match_id/score', requireAdmin, async (req: Request, res: R
        WHERE match_id = $1`,
       [matchId],
     );
+
+    // Clear penalty winner if exists
+    try {
+      clearPenaltyWinner(matchId);
+    } catch (error) {
+      console.error('Error clearing penalty winner:', error);
+    }
 
     return res.json({
       message: 'Match score cleared and all predictions rescored',
@@ -263,8 +271,19 @@ router.put('/matches/:match_id/score', requireAdmin, async (req: Request, res: R
 
     const match = updateResult.rows[0];
 
-    // Rescore all predictions for this match
-    await scoreAllPredictionsForMatch(matchId, { query });
+    // Save penalty winner if provided
+    if (penalty_winner && (penalty_winner === 'home' || penalty_winner === 'away')) {
+      try {
+        savePenaltyWinner(matchId, penalty_winner);
+      } catch (error) {
+        console.error('Error saving penalty winner:', error);
+        // Continue anyway - score was updated
+      }
+    }
+
+    // Rescore all predictions for this match (with penalty winner if available)
+    const savedPenaltyWinner = penalty_winner || getPenaltyWinner(matchId);
+    await scoreAllPredictionsForMatch(matchId, { query }, savedPenaltyWinner);
 
     res.json({
       message: 'Match score updated and predictions rescored',

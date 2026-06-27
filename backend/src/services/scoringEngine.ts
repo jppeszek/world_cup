@@ -7,7 +7,7 @@ export interface ScoreResult {
   reasoning: string;
 }
 
-export function scoreMatch(prediction: Prediction, match: Match): ScoreResult {
+export function scoreMatch(prediction: Prediction, match: Match, penaltyWinner?: 'home' | 'away' | null): ScoreResult {
   if (match.score_home === null || match.score_away === null) {
     return {
       points: 0,
@@ -63,6 +63,14 @@ export function scoreMatch(prediction: Prediction, match: Match): ScoreResult {
     points = 1;
   }
 
+  // Award bonus point for correct penalty prediction in playoff draws
+  let penaltyBonus = 0;
+  if (actualOutcome === 'draw' && penaltyWinner && prediction.pred_winner === penaltyWinner) {
+    penaltyBonus = 1;
+  }
+
+  points += penaltyBonus;
+
   return {
     points,
     outcome: outcomeCorrect,
@@ -78,6 +86,7 @@ export function scoreMatch(prediction: Prediction, match: Match): ScoreResult {
 export async function scoreAllPredictionsForMatch(
   matchId: number,
   db: any,
+  penaltyWinner?: 'home' | 'away' | null,
 ): Promise<Map<number, number>> {
   const { query } = db;
 
@@ -97,7 +106,7 @@ export async function scoreAllPredictionsForMatch(
   const pointsMap = new Map<number, number>();
 
   for (const prediction of predictionsResult.rows) {
-    const result = scoreMatch(prediction, match);
+    const result = scoreMatch(prediction, match, penaltyWinner);
     pointsMap.set(prediction.id, result.points);
 
     // Update prediction with points
