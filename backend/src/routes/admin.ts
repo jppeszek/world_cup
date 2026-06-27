@@ -5,6 +5,7 @@ import { generateRandomToken } from '../utils/hash.js';
 import { scoreAllPredictionsForMatch } from '../services/scoringEngine.js';
 import { sendInviteEmail } from '../services/email.js';
 import { getPenaltyWinner, savePenaltyWinner, clearPenaltyWinner } from '../services/penaltyWinners.js';
+import { seedFixtures } from '../../scripts/seedFixtures.js';
 import fetch from 'node-fetch';
 import db from '../db.js';
 
@@ -387,6 +388,17 @@ router.get('/leaderboard', requireAdmin, async (req: Request, res: Response) => 
   } catch (error) {
     console.error('Get admin leaderboard error:', error);
     res.status(500).json({ error: 'Failed to get leaderboard' });
+  }
+});
+
+// POST /api/admin/seed-fixtures - Seed missing fixtures (admin only, safe to run multiple times)
+router.post('/seed-fixtures', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    await seedFixtures();
+    res.json({ message: 'Fixtures seeded successfully' });
+  } catch (error) {
+    console.error('Seed fixtures error:', error);
+    res.status(500).json({ error: 'Failed to seed fixtures' });
   }
 });
 

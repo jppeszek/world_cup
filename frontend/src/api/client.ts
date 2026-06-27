@@ -51,6 +51,7 @@ export const api = {
   createInvite: (data: { email: string }) => client.post('/admin/invites', data),
   getInvites: () => client.get('/admin/invites'),
   importResults: () => client.post('/admin/import-results'),
+  seedFixtures: () => client.post('/admin/seed-fixtures'),
   setMatchScore: (matchId: number, data: { score_home?: number; score_away?: number; clear?: boolean; penalty_winner?: 'home' | 'away' }) =>
     client.put(`/admin/matches/${matchId}/score`, data),
   updateMatchTeams: (matchId: number, data: { team_home: string; team_away: string }) =>

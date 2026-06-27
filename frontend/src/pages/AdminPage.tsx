@@ -29,6 +29,7 @@ export function AdminPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [importing, setImporting] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   // Score entry state
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
@@ -186,6 +187,22 @@ export function AdminPage() {
       setError(err.response?.data?.error || 'Failed to import results');
     } finally {
       setImporting(false);
+    }
+  };
+
+  const handleSeedFixtures = async () => {
+    setError('');
+    setSuccess('');
+    setSeeding(true);
+
+    try {
+      const response = await api.seedFixtures();
+      setSuccess(response.data.message || 'Fixtures seeded successfully');
+      await loadMatches();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to seed fixtures');
+    } finally {
+      setSeeding(false);
     }
   };
 
@@ -621,6 +638,23 @@ export function AdminPage() {
           >
             {importing ? 'Importing...' : 'Import Results'}
           </button>
+
+          <div className="mt-4 border-t pt-4">
+            <p className="text-gray-600 text-sm mb-2">
+              Add missing fixtures to the database. Safe to run multiple times — existing matches are not affected.
+            </p>
+            <button
+              onClick={handleSeedFixtures}
+              disabled={seeding}
+              className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition ${
+                seeding
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {seeding ? 'Seeding...' : 'Seed Missing Fixtures'}
+            </button>
+          </div>
 
           <div className="mt-6 bg-gray-50 p-4 rounded border border-gray-200">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">How it works:</h3>

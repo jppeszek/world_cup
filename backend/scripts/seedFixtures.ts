@@ -95,28 +95,46 @@ const FIXTURES_2026: Fixture[] = [
   { home: 'Algeria', away: 'Austria', date: '2026-06-28', time: '02:00', venue: 'Kansas City Stadium', stage: 'group' },
   { home: 'Jordan', away: 'Argentina', date: '2026-06-28', time: '02:00', venue: 'Dallas Stadium', stage: 'group' },
 
-  // Round of 16
+  // Round of 32 (June 28 - July 3)
+  { home: '2nd A', away: '2nd B', date: '2026-06-28', time: '19:00', venue: 'Los Angeles Stadium', stage: 'round-of-32' },
+  { home: '1st C', away: '2nd F', date: '2026-06-29', time: '17:00', venue: 'Houston Stadium', stage: 'round-of-32' },
+  { home: '1st E', away: '3rd Place', date: '2026-06-29', time: '20:30', venue: 'Boston Stadium', stage: 'round-of-32' },
+  { home: '1st F', away: '2nd C', date: '2026-06-30', time: '01:00', venue: 'Monterrey Stadium', stage: 'round-of-32' },
+  { home: '2nd E', away: '2nd I', date: '2026-06-30', time: '17:00', venue: 'Dallas Stadium', stage: 'round-of-32' },
+  { home: '1st I', away: '3rd Place', date: '2026-06-30', time: '21:00', venue: 'New York New Jersey Stadium', stage: 'round-of-32' },
+  { home: '1st A', away: '3rd Place', date: '2026-07-01', time: '01:00', venue: 'Mexico City Stadium', stage: 'round-of-32' },
+  { home: '1st G', away: '3rd Place', date: '2026-07-01', time: '20:00', venue: 'Seattle Stadium', stage: 'round-of-32' },
+  { home: '1st L', away: '3rd Place', date: '2026-07-01', time: '16:00', venue: 'Atlanta Stadium', stage: 'round-of-32' },
+  { home: '1st D', away: '3rd Place', date: '2026-07-02', time: '00:00', venue: 'San Francisco Bay Area Stadium', stage: 'round-of-32' },
+  { home: '1st H', away: '2nd J', date: '2026-07-02', time: '19:00', venue: 'Los Angeles Stadium', stage: 'round-of-32' },
+  { home: '2nd K', away: '2nd L', date: '2026-07-02', time: '23:00', venue: 'Toronto Stadium', stage: 'round-of-32' },
+  { home: '1st B', away: '3rd Place', date: '2026-07-03', time: '03:00', venue: 'BC Place', stage: 'round-of-32' },
+  { home: '2nd D', away: '2nd G', date: '2026-07-03', time: '18:00', venue: 'Dallas Stadium', stage: 'round-of-32' },
+  { home: '1st J', away: '2nd H', date: '2026-07-03', time: '22:00', venue: 'Miami Stadium', stage: 'round-of-32' },
+  { home: '1st K', away: '3rd Place', date: '2026-07-04', time: '01:30', venue: 'Kansas City Stadium', stage: 'round-of-32' },
+
+  // Round of 16 (July 4-7)
   { home: 'W74', away: 'W77', date: '2026-07-04', time: '19:00', venue: 'Houston Stadium', stage: 'round-of-16' },
   { home: 'W73', away: 'W75', date: '2026-07-04', time: '23:00', venue: 'Philadelphia Stadium', stage: 'round-of-16' },
   { home: 'W76', away: 'W78', date: '2026-07-05', time: '04:00', venue: 'New York New Jersey Stadium', stage: 'round-of-16' },
   { home: 'W79', away: 'W80', date: '2026-07-05', time: '20:00', venue: 'Mexico City Stadium', stage: 'round-of-16' },
-  { home: 'W83', away: 'W84', date: '2026-07-06', time: '01:00', venue: 'Dallas Stadium', stage: 'round-of-16' },
-  { home: 'W81', away: 'W82', date: '2026-07-06', time: '02:00', venue: 'Seattle Stadium', stage: 'round-of-16' },
+  { home: 'W83', away: 'W84', date: '2026-07-06', time: '19:00', venue: 'Los Angeles Stadium', stage: 'round-of-16' },
+  { home: 'W81', away: 'W82', date: '2026-07-06', time: '23:00', venue: 'Seattle Stadium', stage: 'round-of-16' },
   { home: 'W85', away: 'W87', date: '2026-07-07', time: '04:00', venue: 'BC Place', stage: 'round-of-16' },
   { home: 'W86', away: 'W88', date: '2026-07-07', time: '20:00', venue: 'Atlanta Stadium', stage: 'round-of-16' },
 
-  // Quarter-finals
+  // Quarter-finals (July 9-11)
   { home: 'W89', away: 'W90', date: '2026-07-09', time: '04:00', venue: 'Boston Stadium', stage: 'quarter-final' },
-  { home: 'W93', away: 'W94', date: '2026-07-09', time: '21:00', venue: 'Los Angeles Stadium', stage: 'quarter-final' },
+  { home: 'W93', away: 'W94', date: '2026-07-10', time: '21:00', venue: 'Los Angeles Stadium', stage: 'quarter-final' },
   { home: 'W91', away: 'W92', date: '2026-07-11', time: '01:00', venue: 'Miami Stadium', stage: 'quarter-final' },
   { home: 'W95', away: 'W96', date: '2026-07-11', time: '03:00', venue: 'Kansas City Stadium', stage: 'quarter-final' },
 
-  // Semi-finals
+  // Semi-finals (July 14-15)
   { home: 'W97', away: 'W98', date: '2026-07-14', time: '01:00', venue: 'Dallas Stadium', stage: 'semi-final' },
   { home: 'W99', away: 'W100', date: '2026-07-15', time: '01:00', venue: 'Atlanta Stadium', stage: 'semi-final' },
 
-  // Final
-  { home: 'W101', away: 'W102', date: '2026-07-18', time: '23:00', venue: 'Miami Stadium', stage: 'final' },
+  // Final (July 19)
+  { home: 'W101', away: 'W102', date: '2026-07-19', time: '20:00', venue: 'New York New Jersey Stadium', stage: 'final' },
 ];
 
 export async function seedFixtures() {
@@ -159,10 +177,11 @@ export async function seedFixtures() {
 
     console.log(`✅ Successfully inserted ${insertedCount} matches\n`);
     console.log(`📅 2026 FIFA World Cup Schedule:`);
-    console.log(`   • Group Stage: June 11-26`);
-    console.log(`   • Round of 16: June 29 - July 2`);
-    console.log(`   • Quarter-finals: July 5-6`);
-    console.log(`   • Semi-finals: July 9-10`);
+    console.log(`   • Group Stage: June 11 - June 27`);
+    console.log(`   • Round of 32: June 28 - July 4`);
+    console.log(`   • Round of 16: July 4-7`);
+    console.log(`   • Quarter-finals: July 9-11`);
+    console.log(`   • Semi-finals: July 14-15`);
     console.log(`   • Final: July 19`);
   } catch (error) {
     console.error('Error seeding fixtures:', error);
