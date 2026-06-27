@@ -32,6 +32,7 @@ export function AdminPage() {
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
   const [scoreHome, setScoreHome] = useState('');
   const [scoreAway, setScoreAway] = useState('');
+  const [penaltyWinner, setPenaltyWinner] = useState<'home' | 'away' | ''>('');
   const [settingScore, setSettingScore] = useState(false);
 
   // Team edit state
@@ -122,14 +123,22 @@ export function AdminPage() {
     setSettingScore(true);
 
     try {
-      const response = await api.setMatchScore(selectedMatchId, {
+      const scoreData: any = {
         score_home: parseInt(scoreHome),
         score_away: parseInt(scoreAway),
-      });
-      setSuccess(`Score updated: ${scoreHome}-${scoreAway}`);
+      };
+
+      // Add penalty winner if match is a draw and one is selected
+      if (parseInt(scoreHome) === parseInt(scoreAway) && penaltyWinner) {
+        scoreData.penalty_winner = penaltyWinner;
+      }
+
+      const response = await api.setMatchScore(selectedMatchId, scoreData);
+      setSuccess(`Score updated: ${scoreHome}-${scoreAway}${penaltyWinner ? ` (Penalty: ${penaltyWinner})` : ''}`);
       setSelectedMatchId(null);
       setScoreHome('');
       setScoreAway('');
+      setPenaltyWinner('');
       await loadMatches();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to set score');
@@ -154,6 +163,7 @@ export function AdminPage() {
       setSelectedMatchId(null);
       setScoreHome('');
       setScoreAway('');
+      setPenaltyWinner('');
       await loadMatches();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to clear score');
@@ -401,6 +411,22 @@ export function AdminPage() {
                 />
               </div>
             </div>
+
+            {scoreHome !== '' && scoreAway !== '' && parseInt(scoreHome) === parseInt(scoreAway) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Penalty Winner (Draw detected)</label>
+                <select
+                  value={penaltyWinner}
+                  onChange={(e) => setPenaltyWinner(e.target.value as 'home' | 'away' | '')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-yellow-50"
+                >
+                  <option value="">— Select penalty winner —</option>
+                  <option value="home">Home (Penalties)</option>
+                  <option value="away">Away (Penalties)</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Select which team won on penalties</p>
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button
