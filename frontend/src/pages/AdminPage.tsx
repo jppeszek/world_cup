@@ -14,9 +14,16 @@ interface Match {
   team_home: string;
   team_away: string;
   kickoff_utc: string;
+  stage: string;
   status: string;
   score_home?: number | null;
   score_away?: number | null;
+}
+
+// Check if a match stage is playoff/knockout (where penalty shootouts can occur)
+function isPlayoffStage(stage: string): boolean {
+  const playoffStages = ['round-of-16', 'quarter-final', 'semi-final', 'final', 'round_16', 'quarterfinal'];
+  return playoffStages.some(s => stage.toLowerCase().includes(s.toLowerCase()));
 }
 
 export function AdminPage() {
@@ -412,7 +419,7 @@ export function AdminPage() {
               </div>
             </div>
 
-            {scoreHome !== '' && scoreAway !== '' && parseInt(scoreHome) === parseInt(scoreAway) && (
+            {scoreHome !== '' && scoreAway !== '' && parseInt(scoreHome) === parseInt(scoreAway) && selectedMatchId && isPlayoffStage(matches.find(m => m.id === selectedMatchId)?.stage || '') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Penalty Winner (Draw detected)</label>
                 <select
