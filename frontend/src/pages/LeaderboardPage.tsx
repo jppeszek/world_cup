@@ -35,21 +35,6 @@ export function LeaderboardPage() {
       const stored = storedData ? JSON.parse(storedData) : null;
       const previousLeaderboard = stored?.data || null;
 
-      // Create a hash of current leaderboard to detect changes
-      const currentHash = JSON.stringify(currentLeaderboard.map((e: LeaderboardEntry) => ({
-        user_id: e.user_id,
-        rank: e.rank
-      })));
-      const storedHash = stored?.hash;
-
-      // If leaderboard has changed, update the snapshot
-      if (currentHash !== storedHash) {
-        localStorage.setItem('leaderboard_snapshot', JSON.stringify({
-          hash: currentHash,
-          data: currentLeaderboard
-        }));
-      }
-
       // Calculate position changes from previous snapshot
       const leaderboardWithChanges = currentLeaderboard.map((entry: LeaderboardEntry) => {
         if (!previousLeaderboard) {
@@ -61,6 +46,16 @@ export function LeaderboardPage() {
       });
 
       setLeaderboard(leaderboardWithChanges);
+
+      // Always update snapshot as the new reference point for next comparison
+      const currentHash = JSON.stringify(currentLeaderboard.map((e: LeaderboardEntry) => ({
+        user_id: e.user_id,
+        rank: e.rank
+      })));
+      localStorage.setItem('leaderboard_snapshot', JSON.stringify({
+        hash: currentHash,
+        data: currentLeaderboard
+      }));
     } catch (err) {
       setError('Failed to load leaderboard');
     } finally {
