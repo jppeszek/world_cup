@@ -14,7 +14,7 @@ async function rebuildLeaderboard() {
       COALESCE(SUM(p.points), 0) as total_score,
       COUNT(CASE WHEN p.points > 0 THEN 1 END) as matches_scored,
       COUNT(CASE WHEN p.pred_home = m.score_home AND p.pred_away = m.score_away THEN 1 END) as exact_score_hits,
-      COUNT(CASE WHEN p.id IS NOT NULL THEN 1 END) as matches_predicted
+      COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) as matches_predicted
     FROM users u
     LEFT JOIN predictions p ON u.id = p.user_id
     LEFT JOIN matches m ON p.match_id = m.id AND m.score_home IS NOT NULL AND m.score_away IS NOT NULL
@@ -55,7 +55,7 @@ router.get('/me/stats', requireAuth, async (req: Request, res: Response) => {
         COALESCE(SUM(p.points), 0) as total_score,
         COUNT(CASE WHEN p.points > 0 THEN 1 END) as matches_scored,
         COUNT(CASE WHEN p.pred_home = m.score_home AND p.pred_away = m.score_away THEN 1 END) as exact_score_hits,
-        COUNT(CASE WHEN p.id IS NOT NULL THEN 1 END) as matches_predicted
+        COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) as matches_predicted
       FROM predictions p
       LEFT JOIN matches m ON p.match_id = m.id AND m.score_home IS NOT NULL AND m.score_away IS NOT NULL
       WHERE p.user_id = $1`,
