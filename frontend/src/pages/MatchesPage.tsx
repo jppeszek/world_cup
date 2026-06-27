@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import { formatMatchTime, formatTimeUntilKickoff, getTimeUntilKickoff } from '../utils/timezone';
+import { isPlayoffStage } from '../utils/stageUtils';
 
 interface Match {
   id: number;
@@ -289,7 +290,7 @@ export function MatchesPage() {
                         </div>
 
                         {parseInt(formData.home) === parseInt(formData.away) &&
-                        match.stage !== 'group' ? (
+                        isPlayoffStage(match.stage) ? (
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
                               In case of draw in extra time who wins on penalties

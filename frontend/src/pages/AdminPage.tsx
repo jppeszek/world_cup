@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
+import { isPlayoffStage } from '../utils/stageUtils';
 
 interface Invite {
   id: number;
@@ -18,12 +19,6 @@ interface Match {
   status: string;
   score_home?: number | null;
   score_away?: number | null;
-}
-
-// Check if a match stage is playoff/knockout (where penalty shootouts can occur)
-function isPlayoffStage(stage: string): boolean {
-  const playoffStages = ['round-of-16', 'quarter-final', 'semi-final', 'final', 'round_16', 'quarterfinal'];
-  return playoffStages.some(s => stage.toLowerCase().includes(s.toLowerCase()));
 }
 
 export function AdminPage() {
