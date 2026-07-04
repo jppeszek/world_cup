@@ -30,6 +30,10 @@ export function LoginPage() {
       <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">⚽ World Cup 2026</h1>
 
+        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-6 rounded">
+          <p className="text-amber-800 font-semibold text-sm">🎁 Last minute update: Prizes are being prepared for 3 top players!!!</p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
